@@ -1,39 +1,27 @@
 import axios from "axios";
 import { useEffect, useRef, useState } from "react";
-import { uniq, without } from "lodash-es";
 import {
-  AppBar,
   CssBaseline,
   Card,
   CardContent,
   CardHeader,
-  Toolbar,
   Typography,
   Grid,
-  Container,
-  Drawer,
-  List,
-  ListItemText,
-  IconButton,
-  Divider,
-  ListItemButton,
   ThemeProvider,
+  Container,
+  Stack,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import NotificationsIcon from "@mui/icons-material/Notifications";
-import NotificationsOffIcon from "@mui/icons-material/NotificationsOff";
 import theme from "./theme";
 import { initializeFCM } from "./firebase";
-import useKnwonTopics from "./useKnwonTopics";
-import useDeviceTopics from "./useDeviceTopics";
 import useNotifications from "./useNotifications";
+import Layout from "./Layout";
+import TopicsList from "./TopicsList";
 
 export default function App() {
   const $notifications = useNotifications();
   const fetchNextRef = useRef($notifications.fetchNextPage);
-  const [open, setOpen] = useState(false);
   const [token, setToken] = useState("");
-  const [selectedTopic, setSelectedTopic] = useState("");
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchNext = () => fetchNextRef.current();
@@ -60,12 +48,6 @@ export default function App() {
       document.removeEventListener("visibilitychange", fetchNext);
     };
   }, []);
-
-  const $knwonTopics = useKnwonTopics();
-  const $deviceTopics = useDeviceTopics(token);
-
-  const knwonTopics = $knwonTopics.data || [];
-  const deviceTopics = $deviceTopics.data || [];
 
   const notificationsCards =
     $notifications.data?.pages
@@ -104,95 +86,28 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <AppBar position="static">
-        <Toolbar>
-          <IconButton
-            edge="start"
-            color="inherit"
-            onClick={() => setOpen(true)}
-            aria-label="menu"
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6">Notifications</Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer anchor="left" open={open} onClose={() => setOpen(false)}>
-        <List sx={{ width: 250, backgroundColor: "#44475a" }}>
-          <Typography variant="h6" sx={{ p: 2, color: "#f8f8f2" }}>
-            Topics
-          </Typography>
-          <Divider />
-          <ListItemButton
-            onClick={() => {
-              setSelectedTopic("");
-              setOpen(false);
-            }}
-            sx={{ color: "#f8f8f2" }}
-          >
-            <ListItemText primary="All Topics" />
-          </ListItemButton>
-          {knwonTopics.map((topic) => {
-            const isDeviceTopic = deviceTopics.includes(topic);
-
-            return (
-              <ListItemButton
-                key={topic}
-                onClick={() => {
-                  setSelectedTopic(topic);
-                  setOpen(false);
-                }}
-                sx={{ color: "#f8f8f2" }}
-              >
-                <ListItemText
-                  primary={
-                    <Typography sx={{ display: "flex", alignItems: "center" }}>
-                      <IconButton
-                        onClick={(e) => {
-                          e.stopPropagation();
-
-                          axios
-                            .post(
-                              isDeviceTopic
-                                ? `/api/devices/topics/${topic}/unsubscribe`
-                                : `/api/devices/topics/${topic}/subscribe`,
-                              { token }
-                            )
-                            .then(() => $deviceTopics.refetch());
-                        }}
-                        sx={{
-                          color: isDeviceTopic ? "#50fa7b" : "#ff5555",
-                          mr: 1,
-                        }}
-                      >
-                        {isDeviceTopic ? (
-                          <NotificationsIcon />
-                        ) : (
-                          <NotificationsOffIcon />
-                        )}
-                      </IconButton>
-                      {topic}
-                    </Typography>
-                  }
-                />
-              </ListItemButton>
-            );
-          })}
-        </List>
-      </Drawer>
-      <Container sx={{ py: 3 }}>
-        <Grid container spacing={2}>
+      <Layout
+        title={selectedTopic ? `NtfyCenter - ${selectedTopic}` : "NtfyCenter"}
+        sidebar={
+          <TopicsList
+            token={token}
+            selectedTopic={selectedTopic}
+            setSelectedTopic={setSelectedTopic}
+          />
+        }
+      >
+        <Stack sx={{ py: 2, mx: "auto", maxWidth: 700 }} gap={3}>
           {notificationsCards.length > 0 ? (
             notificationsCards
           ) : (
-            <Grid item xs={12}>
-              <Typography variant="body2" color="#f8f8f2" align="center">
-                No notifications found for this topic.
-              </Typography>
-            </Grid>
+            <Typography align="center">
+              {selectedTopic
+                ? "No notifications found for this topic."
+                : "No notifications yet."}
+            </Typography>
           )}
-        </Grid>
-      </Container>
+        </Stack>
+      </Layout>
     </ThemeProvider>
   );
 }
