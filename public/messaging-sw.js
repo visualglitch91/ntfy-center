@@ -23,9 +23,9 @@ try {
 }
 
 function notify(notification) {
-  self.registration.showNotification(
+  return self.registration.showNotification(
     [notification.topic, notification.title].filter(Boolean).join(": "),
-    { body: notification.body }
+    { body: notification.body, icon: notification.icon }
   );
 }
 
@@ -58,5 +58,5 @@ self.addEventListener("notificationclick", (event) => {
 });
 
 messaging.onBackgroundMessage((payload) => {
-  notify(JSON.parse(payload.data.raw));
+  return notify(JSON.parse(payload.data.raw));
 });

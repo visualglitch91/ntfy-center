@@ -14,7 +14,7 @@ export async function requestToken() {
         // Register the service worker
         const registration = await navigator.serviceWorker.register(
           `/messaging-sw.js?${new URLSearchParams({
-            swVersion: "20",
+            swVersion: "25",
             baseURL: config.baseURL,
             ...config.firebase,
           }).toString()}`
