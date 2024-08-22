@@ -14,7 +14,7 @@ export default function Sidebar({
   selectedTopic,
   setSelectedTopic,
 }: {
-  token: string | null | false;
+  token: string;
   selectedTopic: string | null;
   setSelectedTopic: (value: string | null) => void;
 }) {

@@ -7,12 +7,13 @@ importScripts(
   `https://www.gstatic.com/firebasejs/10.13.0/firebase-messaging-compat.js`
 );
 
-const urlParams = new URLSearchParams(location.search);
-const { baseURL, ...firebaseConfig } = Object.fromEntries(urlParams);
+const config = JSON.parse(
+  atob(new URLSearchParams(location.search).get("config"))
+);
 
-firebase.initializeApp(firebaseConfig);
+const channel = new BroadcastChannel(config.broadcastChannelKey);
 
-console.log("[firebase-messaging-sw.js] initializeApp ", firebaseConfig);
+firebase.initializeApp(config.firebase);
 
 let messaging;
 
@@ -29,9 +30,7 @@ function notify(notification) {
   );
 }
 
-self.addEventListener("message", (event) => {
-  const payload = event.data;
-
+channel.addEventListener("message", ({ data: payload }) => {
   if (payload.type === "FOREGROUND_MESSAGE") {
     notify(payload.data);
   }
@@ -45,18 +44,19 @@ self.addEventListener("notificationclick", (event) => {
       .matchAll({ type: "window", includeUncontrolled: true })
       .then((clientList) => {
         const existingClient = clientList.find(
-          (client) => client.url === baseURL
+          (client) => client.url === config.baseURL
         );
 
         if (existingClient) {
           existingClient.focus();
         } else {
-          clients.openWindow(baseURL);
+          clients.openWindow(config.baseURL);
         }
       })
   );
 });
 
 messaging.onBackgroundMessage((payload) => {
+  channel.postMessage({ type: "BACKGROUND_MESSAGE" });
   return notify(JSON.parse(payload.data.raw));
 });

@@ -5,6 +5,5 @@ export default function useKnwonTopics() {
   return useQuery({
     queryKey: ["knownTopics"],
     queryFn: () => axios.get<string[]>("/api/topics").then((res) => res.data),
-    refetchOnWindowFocus: true,
   });
 }

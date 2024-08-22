@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useDeviceTopics(token: string | null | false) {
+export default function useDeviceTopics(token: string) {
   return useQuery({
     queryKey: ["deviceTopics"],
     queryFn: () => {
@@ -9,7 +9,5 @@ export default function useDeviceTopics(token: string | null | false) {
         .post<string[]>("/api/devices/topics/list", { token })
         .then((res) => res.data);
     },
-    enabled: Boolean(token),
-    refetchOnWindowFocus: true,
   });
 }

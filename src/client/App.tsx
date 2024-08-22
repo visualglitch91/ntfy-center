@@ -8,41 +8,47 @@ import {
   Stack,
 } from "@mui/material";
 import theme from "./theme";
-import { requestToken } from "./firebase";
+import initializeFCM, { BROADCAST_CHANNEL_KEY } from "./initializeFCM";
 import useNotifications from "./useNotifications";
 import Layout from "./Layout";
 import Sidebar from "./Sidebar";
 import NotificationCard from "./NotificationCard";
 import GlossyPaper from "./GlossyPaper";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function App() {
+  const queryClient = useQueryClient();
   const $notifications = useNotifications();
-  const refetchRef = useRef($notifications.refetch);
-  const [token, setToken] = useState<null | false | string>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
-  const setupFCM = async () => {
-    const token = await requestToken();
-    setToken(token);
-
-    if (token) {
-      await axios.post("/api/devices/register", { token });
-      console.log("FCM ready with token", token);
-    } else {
-      console.log("FCM setup failed");
-    }
-  };
-
   useEffect(() => {
-    setupFCM();
+    initializeFCM().then(
+      (token) => {
+        setToken(token);
+        axios.post("/api/devices/register", { token });
+        console.log("FCM ready with token", token);
+      },
+      () => {
+        console.log("FCM setup failed");
+      }
+    );
 
-    const refetch = () => refetchRef.current();
-    window.addEventListener("focus", refetch);
-    document.addEventListener("visibilitychange", refetch);
+    const fcmChannel = new BroadcastChannel(BROADCAST_CHANNEL_KEY);
+
+    const onMessage = ({ data: payload }: any) => {
+      if (
+        payload.type === "FOREGROUND_MESSAGE" ||
+        payload.type === "BACKGROUND_MESSAGE"
+      ) {
+        queryClient.refetchQueries();
+      }
+    };
+
+    fcmChannel.addEventListener("message", onMessage);
 
     return () => {
-      window.removeEventListener("focus", refetch);
-      document.removeEventListener("visibilitychange", refetch);
+      fcmChannel.removeEventListener("message", onMessage);
     };
   }, []);
 
@@ -66,6 +72,10 @@ export default function App() {
         );
       })
       .filter(Boolean) || [];
+
+  if (!token) {
+    return null;
+  }
 
   return (
     <ThemeProvider theme={theme}>
