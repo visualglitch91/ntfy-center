@@ -34,6 +34,9 @@ export default function NotificationCard({
       <CardHeader
         sx={{
           pb: 0,
+          "& .MuiCardHeader-avatar": {
+            mr: 1,
+          },
           "& .MuiCardHeader-title": {
             fontSize: 18,
             fontWeight: 600,
@@ -43,6 +46,11 @@ export default function NotificationCard({
             flexDirection: "column",
           },
         }}
+        avatar={
+          notification.icon && (
+            <img style={{ width: 40, height: 40 }} src={notification.icon} />
+          )
+        }
         action={
           <IconButton onClick={onDelete}>
             <CloseIcon />

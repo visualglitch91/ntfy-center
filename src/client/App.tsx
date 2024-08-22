@@ -35,20 +35,25 @@ export default function App() {
     );
 
     const fcmChannel = new BroadcastChannel(BROADCAST_CHANNEL_KEY);
+    const refetch = () => queryClient.refetchQueries();
 
     const onMessage = ({ data: payload }: any) => {
       if (
         payload.type === "FOREGROUND_MESSAGE" ||
         payload.type === "BACKGROUND_MESSAGE"
       ) {
-        queryClient.refetchQueries();
+        refetch();
       }
     };
 
+    window.addEventListener("focus", refetch);
     fcmChannel.addEventListener("message", onMessage);
+    document.addEventListener("visibilitychange", refetch);
 
     return () => {
+      window.removeEventListener("focus", refetch);
       fcmChannel.removeEventListener("message", onMessage);
+      document.removeEventListener("visibilitychange", refetch);
     };
   }, []);
 
