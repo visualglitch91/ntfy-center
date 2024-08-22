@@ -8,7 +8,7 @@ importScripts(
 );
 
 const urlParams = new URLSearchParams(location.search);
-const firebaseConfig = Object.fromEntries(urlParams);
+const { baseURL, ...firebaseConfig } = Object.fromEntries(urlParams);
 
 firebase.initializeApp(firebaseConfig);
 
@@ -35,6 +35,26 @@ self.addEventListener("message", (event) => {
   if (payload.type === "FOREGROUND_MESSAGE") {
     notify(payload.data);
   }
+});
+
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  event.waitUntil(
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        const existingClient = clientList.find(
+          (client) => client.url === baseURL
+        );
+
+        if (existingClient) {
+          existingClient.focus();
+        } else {
+          clients.openWindow(baseURL);
+        }
+      })
+  );
 });
 
 messaging.onBackgroundMessage((payload) => {
