@@ -28,9 +28,9 @@ export default function Layout({
   const notificationCount =
     useNotificationCount()[selectedTopic || "allTopics"];
 
-  const documentTitle = selectedTopic
-    ? `(${notificationCount}) NtfyCenter | ${selectedTopic}`
-    : `(${notificationCount}) NtfyCenter`;
+  const documentTitle = `${notificationCount ? `(${notificationCount}) ` : ""}${
+    selectedTopic ? `NtfyCenter | ${selectedTopic}` : "NtfyCenter"
+  }`;
 
   const handleDrawerClose = () => {
     setIsClosing(true);
