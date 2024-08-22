@@ -1,50 +1,20 @@
 import axios from "axios";
-import {
-  List,
-  ListItemText,
-  IconButton,
-  Divider,
-  ListItem,
-  darken,
-  styled,
-  ListItemProps,
-  ButtonBase,
-  alpha,
-  Badge,
-  Box,
-} from "@mui/material";
+import { List, ListItemText, IconButton, Box } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOffOutlined";
 import useKnwonTopics from "./useKnwonTopics";
 import useDeviceTopics from "./useDeviceTopics";
 import useNotificationCount from "./useNotificationCount";
 import LabelWithCount from "./LabelWithCount";
+import SidebarItem from "./SidebarItem";
+import fullReload from "./fullReload";
 
-const ListItemButton = styled((props: ListItemProps) => (
-  <ListItem component={ButtonBase} {...props} />
-))<{ isSelected: boolean }>(({ theme, isSelected }) =>
-  isSelected
-    ? {
-        "&, &:focus": {
-          background: alpha(darken(theme.palette.background.paper, 0.2), 0.3),
-        },
-        "&:hover": {
-          background: alpha(darken(theme.palette.background.paper, 0.25), 0.3),
-        },
-      }
-    : {
-        "&:hover": {
-          background: alpha(darken(theme.palette.background.paper, 0.1), 0.3),
-        },
-      }
-);
-
-export default function TopicsList({
+export default function Sidebar({
   token,
   selectedTopic,
   setSelectedTopic,
 }: {
-  token: string;
+  token: string | null | false;
   selectedTopic: string | null;
   setSelectedTopic: (value: string | null) => void;
 }) {
@@ -57,7 +27,7 @@ export default function TopicsList({
 
   return (
     <List>
-      <ListItemButton
+      <SidebarItem
         divider
         isSelected={selectedTopic === null}
         onClick={() => setSelectedTopic(null)}
@@ -67,14 +37,14 @@ export default function TopicsList({
             <LabelWithCount label="All Topics" count={count.allTopics || 0} />
           }
         />
-      </ListItemButton>
-      {knwonTopics.map((topic, index, list) => {
+      </SidebarItem>
+      {knwonTopics.map((topic) => {
         const isSelectedTopic = topic === selectedTopic;
         const isDeviceTopic = deviceTopics.includes(topic);
 
         return (
-          <ListItemButton
-            divider={index < list.length - 1}
+          <SidebarItem
+            divider
             key={topic}
             isSelected={isSelectedTopic}
             onClick={() => setSelectedTopic(topic)}
@@ -118,9 +88,12 @@ export default function TopicsList({
                 />
               }
             />
-          </ListItemButton>
+          </SidebarItem>
         );
       })}
+      <SidebarItem onClick={() => fullReload()}>
+        <ListItemText primary="Full Reload" />
+      </SidebarItem>
     </List>
   );
 }

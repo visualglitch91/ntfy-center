@@ -22,17 +22,21 @@ try {
   console.error("Failed to initialize Firebase Messaging", err);
 }
 
-messaging.onBackgroundMessage((payload) => {
-  console.log(
-    "[firebase-messaging-sw.js] Received background message ",
-    payload
+function notify(notification) {
+  self.registration.showNotification(
+    [notification.topic, notification.title].filter(Boolean).join(": "),
+    { body: notification.body }
   );
+}
 
-  // Customize notification here
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-  };
+self.addEventListener("message", (event) => {
+  const payload = event.data;
 
-  self.registration.showNotification(notificationTitle, notificationOptions);
+  if (payload.type === "FOREGROUND_MESSAGE") {
+    notify(payload.data);
+  }
+});
+
+messaging.onBackgroundMessage((payload) => {
+  notify(JSON.parse(payload.data.raw));
 });

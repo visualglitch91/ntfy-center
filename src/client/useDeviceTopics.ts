@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
 
-export default function useDeviceTopics(token?: string) {
+export default function useDeviceTopics(token: string | null | false) {
   return useQuery({
     queryKey: ["deviceTopics"],
     queryFn: () => {

@@ -24,12 +24,6 @@ notificationsRouter.post("/", async (req, res) => {
   await addKnownTopic(notification.topic);
 
   await admin.messaging().send({
-    notification: {
-      title: [notification.topic, notification.title]
-        .filter(Boolean)
-        .join(": "),
-      body: notification.body,
-    },
     data: { raw: JSON.stringify(notification) },
     topic: formatTopic(notification.topic),
   });
