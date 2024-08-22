@@ -1,10 +1,14 @@
 import { createJSONdb } from "./utils";
 import { listAllDevices, subscribe } from "./devices.utils";
 
-export const knownTopicsDB = createJSONdb<true>("knownTopics");
+export const knownTopicsDB = createJSONdb<{ icon?: string }>("knownTopics");
 
 export function listKnownTopics() {
   return Object.keys(knownTopicsDB.JSON());
+}
+
+export function getTopicIcon(topic: string) {
+  return knownTopicsDB.get(topic)?.icon;
 }
 
 export async function addKnownTopic(topic: string) {
@@ -16,7 +20,7 @@ export async function addKnownTopic(topic: string) {
       [topic]
     );
 
-    knownTopicsDB.set(topic, true);
+    knownTopicsDB.set(topic, {});
     await new Promise((resolve) => setTimeout(resolve, 300));
   }
 }

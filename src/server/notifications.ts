@@ -2,7 +2,7 @@ import { Router } from "express";
 import admin from "firebase-admin";
 import ShortUniqueId from "short-unique-id";
 import { Notification } from "../common/types";
-import { addKnownTopic } from "./topics.utils";
+import { addKnownTopic, getTopicIcon } from "./topics.utils";
 import { notificationsDB, capNotifications } from "./notifications.utils";
 import { formatTopic } from "./utils";
 
@@ -12,6 +12,8 @@ const notificationsRouter = Router();
 notificationsRouter.post("/", async (req, res) => {
   const id = uid.seq();
   const notification: Notification = { id, ...req.body };
+
+  notification.icon = getTopicIcon(notification.topic);
 
   if (!notification.timestamp) {
     notification.timestamp = Date.now().toString();

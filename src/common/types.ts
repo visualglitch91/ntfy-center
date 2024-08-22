@@ -3,6 +3,7 @@ export interface Notification {
   topic: string;
   title: string;
   body: string;
+  icon?: string;
   timestamp: string;
 }
 
