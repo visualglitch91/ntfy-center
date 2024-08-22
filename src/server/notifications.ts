@@ -1,18 +1,16 @@
 import { Router } from "express";
 import admin from "firebase-admin";
+import ShortUniqueId from "short-unique-id";
 import { Notification } from "../common/types";
 import { addKnownTopic } from "./topics.utils";
-import {
-  notificationsDB,
-  capNotifications,
-  listAllNotifications,
-} from "./notifications.utils";
+import { notificationsDB, capNotifications } from "./notifications.utils";
 import { formatTopic } from "./utils";
 
+const uid = new ShortUniqueId({ length: 10 });
 const notificationsRouter = Router();
 
 notificationsRouter.post("/", async (req, res) => {
-  const id = (listAllNotifications().length + 1).toString();
+  const id = uid.seq();
   const notification: Notification = { id, ...req.body };
 
   if (!notification.timestamp) {
@@ -39,20 +37,8 @@ notificationsRouter.post("/", async (req, res) => {
   res.sendStatus(200);
 });
 
-notificationsRouter.get("/", (req, res) => {
-  const id = Number(req.query.since);
-
-  if (isNaN(id)) {
-    return res.status(400).json({ error: "Invalid id" });
-  }
-
-  const allNotifications = Object.values(notificationsDB.JSON());
-
-  const filteredNotifications = allNotifications.filter((notification) => {
-    return Number(notification.id) > id;
-  });
-
-  res.json(filteredNotifications);
+notificationsRouter.get("/", (_, res) => {
+  res.json(Object.values(notificationsDB.JSON()));
 });
 
 notificationsRouter.delete("/:id", (req, res) => {

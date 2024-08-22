@@ -11,7 +11,10 @@ export function capNotifications() {
   const allNotifications = listAllNotifications();
 
   if (allNotifications.length >= 90) {
-    allNotifications.sort((a, b) => Number(a.id) - Number(b.id));
-    notificationsDB.delete(allNotifications[0].id);
+    const oldestNotification = allNotifications.shift();
+
+    if (oldestNotification) {
+      notificationsDB.delete(oldestNotification.id);
+    }
   }
 }
