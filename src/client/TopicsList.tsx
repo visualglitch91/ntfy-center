@@ -9,11 +9,16 @@ import {
   styled,
   ListItemProps,
   ButtonBase,
+  alpha,
+  Badge,
+  Box,
 } from "@mui/material";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import NotificationsOffIcon from "@mui/icons-material/NotificationsOffOutlined";
 import useKnwonTopics from "./useKnwonTopics";
 import useDeviceTopics from "./useDeviceTopics";
+import useNotificationCount from "./useNotificationCount";
+import LabelWithCount from "./LabelWithCount";
 
 const ListItemButton = styled((props: ListItemProps) => (
   <ListItem component={ButtonBase} {...props} />
@@ -21,15 +26,15 @@ const ListItemButton = styled((props: ListItemProps) => (
   isSelected
     ? {
         "&, &:focus": {
-          background: darken(theme.palette.background.paper, 0.2),
+          background: alpha(darken(theme.palette.background.paper, 0.2), 0.3),
         },
         "&:hover": {
-          background: darken(theme.palette.background.paper, 0.25),
+          background: alpha(darken(theme.palette.background.paper, 0.25), 0.3),
         },
       }
     : {
         "&:hover": {
-          background: darken(theme.palette.background.paper, 0.1),
+          background: alpha(darken(theme.palette.background.paper, 0.1), 0.3),
         },
       }
 );
@@ -45,6 +50,7 @@ export default function TopicsList({
 }) {
   const $knwonTopics = useKnwonTopics();
   const $deviceTopics = useDeviceTopics(token);
+  const count = useNotificationCount();
 
   const knwonTopics = $knwonTopics.data || [];
   const deviceTopics = $deviceTopics.data || [];
@@ -52,18 +58,23 @@ export default function TopicsList({
   return (
     <List>
       <ListItemButton
+        divider
         isSelected={selectedTopic === null}
         onClick={() => setSelectedTopic(null)}
       >
-        <ListItemText primary="All Topics" />
+        <ListItemText
+          primary={
+            <LabelWithCount label="All Topics" count={count.allTopics || 0} />
+          }
+        />
       </ListItemButton>
-      <Divider />
-      {knwonTopics.map((topic) => {
+      {knwonTopics.map((topic, index, list) => {
         const isSelectedTopic = topic === selectedTopic;
         const isDeviceTopic = deviceTopics.includes(topic);
 
         return (
           <ListItemButton
+            divider={index < list.length - 1}
             key={topic}
             isSelected={isSelectedTopic}
             onClick={() => setSelectedTopic(topic)}
@@ -91,7 +102,22 @@ export default function TopicsList({
               </IconButton>
             }
           >
-            <ListItemText primary={topic} />
+            <ListItemText
+              primary={
+                <LabelWithCount
+                  label={
+                    <Box
+                      overflow="hidden"
+                      whiteSpace="nowrap"
+                      textOverflow="ellipsis"
+                    >
+                      {topic}
+                    </Box>
+                  }
+                  count={count[topic] || 0}
+                />
+              }
+            />
           </ListItemButton>
         );
       })}

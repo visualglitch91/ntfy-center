@@ -7,6 +7,7 @@ import {
   capNotifications,
   listAllNotifications,
 } from "./notifications.utils";
+import { formatTopic } from "./utils";
 
 const notificationsRouter = Router();
 
@@ -32,7 +33,7 @@ notificationsRouter.post("/", async (req, res) => {
       body: notification.body,
     },
     data: { raw: JSON.stringify(notification) },
-    topic: notification.topic,
+    topic: formatTopic(notification.topic),
   });
 
   res.sendStatus(200);

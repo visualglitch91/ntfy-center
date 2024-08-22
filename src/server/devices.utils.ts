@@ -1,7 +1,7 @@
 import { uniq, difference } from "lodash-es";
 import admin from "firebase-admin";
 import { Device } from "../common/types";
-import { createJSONdb } from "./utils";
+import { createJSONdb, formatTopic } from "./utils";
 
 export const devicesDB = createJSONdb<Device>("devices");
 
@@ -10,7 +10,7 @@ export async function subscribe(token: string | string[], topics: string[]) {
 
   await Promise.all(
     topics.map(async (topic) => {
-      await admin.messaging().subscribeToTopic(tokens, topic);
+      await admin.messaging().subscribeToTopic(tokens, formatTopic(topic));
     })
   );
 
@@ -28,7 +28,9 @@ export async function unsubscribe(token: string | string[], topics: string[]) {
   const tokens = new Array<string>().concat(token);
 
   await Promise.all(
-    topics.map((topic) => admin.messaging().unsubscribeFromTopic(tokens, topic))
+    topics.map((topic) =>
+      admin.messaging().unsubscribeFromTopic(tokens, formatTopic(topic))
+    )
   );
 
   tokens.forEach((token) => {

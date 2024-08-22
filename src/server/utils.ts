@@ -8,3 +8,7 @@ export const serverDir: string = dirname(fileURLToPath(import.meta.url));
 export function createJSONdb<T>(name: string) {
   return new JSONdb<T>(`${serverDir}/../../database/${name}.json`);
 }
+
+export function formatTopic(topic: string) {
+  return topic.replace(/[^a-zA-Z0-9-_.~%]/g, "-");
+}

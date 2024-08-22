@@ -1,5 +1,7 @@
 import {
+  Box,
   Card,
+  CardActionArea,
   CardContent,
   CardHeader,
   IconButton,
@@ -7,6 +9,18 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Notification } from "../common/types";
+import GlossyPaper from "./GlossyPaper";
+
+function formatDateShort(timestamp: string | number) {
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  }).format(new Date(Number(timestamp)));
+}
 
 export default function NotificationCard({
   notification,
@@ -16,13 +30,17 @@ export default function NotificationCard({
   onDelete: () => void;
 }) {
   return (
-    <Card>
+    <Card component={GlossyPaper}>
       <CardHeader
         sx={{
           pb: 0,
+          "& .MuiCardHeader-title": {
+            fontSize: 18,
+            fontWeight: 600,
+          },
           "& .MuiCardHeader-content": {
             display: "flex",
-            flexDirection: "column-reverse",
+            flexDirection: "column",
           },
         }}
         action={
@@ -31,12 +49,13 @@ export default function NotificationCard({
           </IconButton>
         }
         title={notification.title}
-        subheader={`${notification.topic} - ${new Date(
-          Number(notification.timestamp)
-        ).toLocaleString()}`}
+        subheader={notification.topic}
       />
-      <CardContent sx={{ pt: 0.5 }}>
+      <CardContent sx={{ pt: 0.5, pb: "16px !important" }}>
         <Typography variant="body2">{notification.body}</Typography>
+        <Typography variant="caption">
+          {formatDateShort(notification.timestamp)}
+        </Typography>
       </CardContent>
     </Card>
   );

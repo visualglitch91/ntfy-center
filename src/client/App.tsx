@@ -13,6 +13,7 @@ import useNotifications from "./useNotifications";
 import Layout from "./Layout";
 import TopicsList from "./TopicsList";
 import NotificationCard from "./NotificationCard";
+import GlossyPaper from "./GlossyPaper";
 
 export default function App() {
   const $notifications = useNotifications();
@@ -72,7 +73,7 @@ export default function App() {
     <ThemeProvider theme={theme}>
       <CssBaseline />
       <Layout
-        title={selectedTopic ? `NtfyCenter - ${selectedTopic}` : "NtfyCenter"}
+        selectedTopic={selectedTopic}
         sidebar={
           <TopicsList
             token={token}
@@ -81,15 +82,17 @@ export default function App() {
           />
         }
       >
-        <Stack sx={{ py: 2, mx: "auto", maxWidth: 700 }} gap={3}>
+        <Stack gap={3}>
           {notificationsCards.length > 0 ? (
             notificationsCards
           ) : (
-            <Typography align="center">
-              {selectedTopic
-                ? "No notifications found for this topic."
-                : "No notifications yet."}
-            </Typography>
+            <GlossyPaper px={3} py={4}>
+              <Typography align="center">
+                {selectedTopic
+                  ? "No notifications found for this topic"
+                  : "No notifications yet"}
+              </Typography>
+            </GlossyPaper>
           )}
         </Stack>
       </Layout>
