@@ -19,7 +19,7 @@ export default function Layout({
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const drawerWidth = Math.min(320, window.innerWidth - 30);
+  const drawerWidth = Math.min(290, window.innerWidth - 30);
 
   const handleDrawerClose = () => {
     setIsClosing(true);
@@ -38,7 +38,7 @@ export default function Layout({
 
   const drawer = (
     <div>
-      <Box display={{ xs: "none", md: "block" }}>
+      <Box display={{ xs: "none", sm: "block" }}>
         <Toolbar />
         <Divider />
       </Box>
@@ -53,7 +53,7 @@ export default function Layout({
 
   return (
     <Box sx={{ display: "flex" }}>
-      <AppBar position="fixed">
+      <AppBar position="fixed" sx={{ background: "#6272a4" }}>
         <Toolbar
           sx={{
             position: "relative",
@@ -96,6 +96,7 @@ export default function Layout({
           {drawer}
         </Drawer>
         <Drawer
+          open
           variant="permanent"
           sx={{
             display: { xs: "none", sm: "block" },
@@ -104,7 +105,6 @@ export default function Layout({
               width: drawerWidth,
             },
           }}
-          open
         >
           {drawer}
         </Drawer>
