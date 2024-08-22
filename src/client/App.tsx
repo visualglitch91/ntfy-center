@@ -17,12 +17,12 @@ import GlossyPaper from "./GlossyPaper";
 
 export default function App() {
   const $notifications = useNotifications();
-  const fetchNextRef = useRef($notifications.fetchNextPage);
+  const refetchRef = useRef($notifications.refetch);
   const [token, setToken] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchNext = () => fetchNextRef.current();
+    const fetchNext = () => refetchRef.current();
 
     window.addEventListener("focus", fetchNext);
     document.addEventListener("visibilitychange", fetchNext);
@@ -34,7 +34,7 @@ export default function App() {
           { body: notification.body }
         );
 
-        fetchNextRef.current();
+        refetchRef.current();
       },
     }).then(async (token) => {
       await axios.post("/api/devices/register", { token });
@@ -48,9 +48,8 @@ export default function App() {
   }, []);
 
   const notificationsCards =
-    $notifications.data?.pages
-      .flat()
-      .reverse()
+    $notifications.data
+      ?.reverse()
       .map((notification) => {
         if (selectedTopic && notification.topic !== selectedTopic) {
           return false;

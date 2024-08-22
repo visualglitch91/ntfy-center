@@ -2,7 +2,7 @@ import useNotifications from "./useNotifications";
 
 export default function useNotificationCount() {
   const $notifications = useNotifications();
-  const notifications = $notifications.data?.pages.flat().reverse() || [];
+  const notifications = $notifications.data?.reverse() || [];
 
   return notifications.reduce(
     (acc, { topic }) => {
