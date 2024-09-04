@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Divider from "@mui/material/Divider";
+import ClearAllIcon from "@mui/icons-material/ClearAll";
 import Drawer from "@mui/material/Drawer";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
@@ -9,17 +9,18 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import GlossyPaper from "./GlossyPaper";
 import useNotificationCount from "./useNotificationCount";
-import LabelWithCount from "./LabelWithCount";
 import StaticBadge from "./StaticBadge";
 
 export default function Layout({
   selectedTopic,
   sidebar,
   children,
+  onClearAll,
 }: {
   selectedTopic: string | null;
   sidebar: React.ReactNode;
   children: React.ReactNode;
+  onClearAll: () => void;
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
@@ -91,6 +92,7 @@ export default function Layout({
             display={{ xs: "flex", md: "none", overflow: "hidden" }}
             alignItems="center"
             gap={1}
+            sx={{ flex: 1 }}
           >
             <Typography
               variant="h6"
@@ -108,9 +110,13 @@ export default function Layout({
             variant="h6"
             noWrap
             component="div"
+            sx={{ flex: 1 }}
           >
             NtfyCenter
           </Typography>
+          <IconButton color="inherit" onClick={onClearAll}>
+            <ClearAllIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
 

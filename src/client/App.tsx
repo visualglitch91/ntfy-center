@@ -94,6 +94,7 @@ export default function App() {
             setSelectedTopic={setSelectedTopic}
           />
         }
+        onClearAll={$notifications.deleteAllNotifications}
       >
         <Stack gap={3}>
           {notificationsCards.length > 0 ? (

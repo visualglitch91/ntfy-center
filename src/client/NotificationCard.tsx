@@ -1,7 +1,5 @@
 import {
-  Box,
   Card,
-  CardActionArea,
   CardContent,
   CardHeader,
   IconButton,
@@ -12,6 +10,12 @@ import { Notification } from "../common/types";
 import GlossyPaper from "./GlossyPaper";
 
 function formatDateShort(timestamp: string | number) {
+  const timestampNum = Number(timestamp);
+
+  if (isNaN(timestampNum)) {
+    return "Invalid Date";
+  }
+
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
@@ -19,7 +23,7 @@ function formatDateShort(timestamp: string | number) {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-  }).format(new Date(Number(timestamp)));
+  }).format(new Date(timestampNum));
 }
 
 export default function NotificationCard({
@@ -60,7 +64,9 @@ export default function NotificationCard({
         subheader={notification.topic}
       />
       <CardContent sx={{ pt: 0.5, pb: "16px !important" }}>
-        <Typography variant="body2">{notification.body}</Typography>
+        <Typography variant="body2" whiteSpace="pre-wrap">
+          {notification.body}
+        </Typography>
         <Typography variant="caption">
           {formatDateShort(notification.timestamp)}
         </Typography>

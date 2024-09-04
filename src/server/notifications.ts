@@ -44,13 +44,17 @@ notificationsRouter.delete("/:id", (req, res) => {
     return res.status(400).json({ error: "Notification ID is required" });
   }
 
+  if (id === "all") {
+    notificationsDB.deleteAll();
+    return res.sendStatus(204);
+  }
+
   if (!notificationsDB.has(id)) {
     return res.status(404).json({ error: "Notification not found" });
   }
 
   notificationsDB.delete(id);
-
-  res.sendStatus(204);
+  return res.sendStatus(204);
 });
 
 export default notificationsRouter;

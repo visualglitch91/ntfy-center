@@ -1,5 +1,5 @@
 import axios from "axios";
-import { InfiniteData, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Notification } from "../common/types";
 
 const queryKey = ["notifications"];
@@ -24,8 +24,14 @@ export default function useNotifications() {
     axios.delete(`/api/notifications/${id}`);
   };
 
+  const deleteAllNotifications = () => {
+    queryClient.setQueryData<Notification[]>(queryKey, (data) => []);
+    axios.delete(`/api/notifications/all`);
+  };
+
   return {
     ...$query,
     deleteNotification,
+    deleteAllNotifications,
   };
 }
